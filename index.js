@@ -15,10 +15,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3500;
 
 // In production, store your secret key in an environment variable
 const JWT_SECRET = process.env.JWT_SECRET || 'your-very-secure-secret';
+
+const dal = require('./dal.js')
+
+const { readActions } = dal;
 
 // Middleware Setup
 app.use(helmet());
@@ -117,7 +121,9 @@ app.post('/actions', authenticateToken, (req, res) => {
 });
 
 // Get all Actions
-app.get('/actions', authenticateToken, (req, res) => {
+app.get('/actions/:username', authenticateToken, (req, res) => {
+  const username = req.params.username;
+  const userActions = readActions(username);
   res.json(actions);
 });
 
@@ -177,3 +183,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
